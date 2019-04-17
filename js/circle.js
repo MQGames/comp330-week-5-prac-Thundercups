@@ -11,9 +11,9 @@ class Circle {
 
         const nSides = 8;
         this.colour = colour;
-        this.points = new Float32Array(this.nSides * 2);
+        this.points = new Float32Array(nSides * 2);
 
-        for (let i = 0; i < this.nSides; i++) {
+        for (let i = 0; i < nSides; i++) {
             this.points[2*i] = 0;     // TODO: set the x coordinate;
             this.points[2*i+1] = 0;   // TODO: set the y coordiante
         }
