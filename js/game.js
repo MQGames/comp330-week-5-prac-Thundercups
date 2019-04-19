@@ -8,7 +8,7 @@ uniform mat3 u_worldMatrix;
 uniform mat3 u_viewMatrix;
 
 void main() {
-    // convert to homogeneous coordinates 
+    // convert to homogeneous coordinates
     vec3 pos = vec3(a_position.xy, 1);
 
     // multiply by world martix
@@ -29,7 +29,7 @@ uniform vec4 u_colour;
 void main() {
     // set the fragment colour
 
-    gl_FragColor = u_colour; 
+    gl_FragColor = u_colour;
 }
 `;
 
@@ -75,7 +75,7 @@ function createProgram(gl, vertexShader, fragmentShader) {
     }
     else {
         return false;
-    }    
+    }
 }
 
 function main() {
@@ -83,7 +83,7 @@ function main() {
     // === Initialisation ===
     const resolution = 50;
 
-    // get the canvas element & gl rendering 
+    // get the canvas element & gl rendering
     const canvas = document.getElementById("c");
     const gl = canvas.getContext("webgl");
 
@@ -91,7 +91,7 @@ function main() {
         window.alert("WebGL not supported!");
         return;
     }
-    
+
     // create GLSL shaders, upload the GLSL source, compile the shaders
     const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
     const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
@@ -109,23 +109,41 @@ function main() {
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     gl.enableVertexAttribArray(positionAttribute);
     gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
-    
+
     // create a solar system
 
-    const yellow = [1,1,0,1];               // Yellow = Red + Green
+    const yellow = [1,1,0,1];
+    const blue = [0,0,1,1];
+    const grey = [0.5, 0.5, 0.5, 1];
+
     const sun = new Circle(yellow);
+
+
+
+
+    // earth is 5 units from the sun and 1/4 its size
+     const earth = new Circle(blue);
+     earth.parent = sun;
+     earth.translation = [5,0];
+     earth.scale = 0.25;
+     // moon is 2 units from the earth and 1/2 its size
+     const moon = new Circle(grey);
+     moon.parent = earth;
+     moon.translation = [0,2];
+     moon.scale = 0.5;
+
 
     // === Per Frame operations ===
 
     // update objects in the scene
     let update = function(deltaTime) {
-        
+
     };
 
     // redraw the scene
     let render = function() {
         // clear the screen
-        gl.viewport(0, 0, canvas.width, canvas.height);        
+        gl.viewport(0, 0, canvas.width, canvas.height);
         gl.clearColor(0, 0, 0, 1);
         gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -136,7 +154,9 @@ function main() {
         gl.uniformMatrix3fv(viewMatrixUniform, false, viewMatrix);
 
         // render everything
-        sun.renderSelf(gl, colourUniform);
+        gl.uniformMatrix3fv(worldMatrixUniform, false, Matrix.identity());
+        sun.render(gl, worldMatrixUniform, colourUniform)
+
     };
 
     // animation loop
@@ -155,5 +175,4 @@ function main() {
 
     // start it going
     animate(0);
-}    
-
+}
